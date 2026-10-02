@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>花蓮建地待售彙整</title>
+<style>
+:root{
+  --bg:#f4f6f3;--surface:#fff;--ink:#1c2420;--muted:#5b6862;--line:#dde3de;
+  --brand:#1d6b51;--brand-ink:#fff;--chip:#e6ede8;
+  --new:#0070C0;--drop:#D00000;--drop-bg:rgba(208,0,0,.09);--shadow:0 1px 2px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#111614;--surface:#1a211e;--ink:#e8eeea;--muted:#9aa8a1;--line:#2c3732;
+    --brand:#4cc29b;--brand-ink:#0a1612;--chip:#25302b;
+    --new:#5aaaf2;--drop:#ff7d74;--drop-bg:rgba(255,125,116,.14);--shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);overflow-wrap:anywhere;
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+}
+.wrap{
+  max-width:1440px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left));
+  padding-right:max(16px,env(safe-area-inset-right));
+}
+.hd{padding-top:max(16px,env(safe-area-inset-top));padding-bottom:8px}
+h1{margin:0;font-size:20px;line-height:1.3}
+.meta{margin-top:2px;font-size:13px;color:var(--muted)}
+
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:8px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink);font:inherit;font-size:15px;cursor:pointer;
+}
+.chip span{margin-left:4px;font-size:13px;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink);font-weight:700}
+.chip[aria-pressed="true"] span{color:inherit;opacity:.85}
+
+.ctl{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0 4px}
+.ctl input[type=search],.ctl select{
+  height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);
+  font:inherit;font-size:16px;padding:0 12px;
+}
+.ctl input[type=search]{flex:1 1 220px;min-width:0;-webkit-appearance:none;appearance:none}
+.ctl select{flex:0 0 auto;max-width:100%}
+.tg,.seg button{
+  height:44px;padding:0 14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  font:inherit;font-size:15px;cursor:pointer;
+}
+.tg{border-radius:10px}
+.tg.drop{color:var(--drop)}
+.tg.new{color:var(--new)}
+.tg span{margin-left:4px;font-size:13px;opacity:.85}
+.tg.drop[aria-pressed="true"]{background:var(--drop);border-color:var(--drop);color:#fff;font-weight:700}
+.tg.new[aria-pressed="true"]{background:var(--new);border-color:var(--new);color:#fff;font-weight:700}
+.seg{display:flex}
+.seg button:first-child{border-radius:10px 0 0 10px}
+.seg button:last-child{border-radius:0 10px 10px 0;border-left:0}
+.seg button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink);font-weight:700}
+.count{padding:6px 0 10px;font-size:13px;color:var(--muted)}
+
+.tag{font-weight:800;margin-right:3px}
+.tag.new{color:var(--new)}
+.tag.drop{color:var(--drop)}
+.dn{
+  display:inline-flex;flex-wrap:wrap;align-items:center;gap:2px 8px;padding:3px 10px;border-radius:8px;
+  background:var(--drop-bg);color:var(--drop);font-weight:700;font-size:14px;
+}
+.dn .rng{font-weight:500;font-size:13px}
+a.tel{color:var(--brand);text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:16px}
+.grp{grid-column:1/-1;margin:12px 0 0;font-size:17px;display:flex;align-items:baseline;gap:8px}
+.grp span{font-size:13px;font-weight:400;color:var(--muted)}
+.card{
+  display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;
+  background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+}
+.c-top{display:flex;align-items:baseline;gap:8px}
+.no{flex:0 0 auto;font-weight:700;color:var(--muted);white-space:nowrap}
+.card h3{margin:0;font-size:16px;line-height:1.4}
+.price{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}
+.price .p{font-size:28px;font-weight:800;line-height:1.2;color:var(--brand)}
+.price .p small{margin-left:2px;font-size:14px;font-weight:600}
+.price .s{font-size:14px;color:var(--muted)}
+.card .dn{align-self:flex-start}
+.kv{display:grid;grid-template-columns:3em 1fr;gap:3px 8px;margin:0;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.ag{padding:1px 0}
+.act{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:4px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:10px;
+  border:1px solid var(--brand);color:var(--brand);text-decoration:none;font-weight:600;font-size:15px;
+}
+.btn.fill{background:var(--brand);color:var(--brand-ink)}
+
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:16px}
+table{width:100%;min-width:1040px;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--chip);font-size:13px;white-space:nowrap}
+th:nth-child(1){min-width:48px}th:nth-child(2){min-width:170px;width:20%}th:nth-child(3){min-width:130px}
+th:nth-child(4){min-width:76px}th:nth-child(5){min-width:70px}th:nth-child(6){min-width:84px}
+th:nth-child(7){min-width:120px;width:13%}th:nth-child(8){min-width:170px;width:18%}th:nth-child(9){min-width:70px}th:nth-child(10){min-width:100px}
+td.n,th.n{text-align:right}
+td.n{white-space:nowrap}
+td.no2{white-space:nowrap;font-weight:700}
+td.nt .dn{display:inline-flex;flex-direction:column;align-items:flex-start;gap:0;white-space:nowrap}
+tr.g td{background:var(--chip);font-weight:700}
+tr:last-child td{border-bottom:0}
+@media (min-width:1100px){
+  .tablewrap{overflow:visible}
+  th{position:sticky;top:var(--barh,56px);z-index:2}
+}
+.empty{padding:40px 0;text-align:center;color:var(--muted)}
+.top{
+  position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));
+  width:48px;height:48px;border-radius:50%;border:0;background:var(--brand);color:var(--brand-ink);
+  font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.top.show{opacity:1;pointer-events:auto}
+</style>
+</head>
+<body>
+<header class="wrap hd">
+  <h1>花蓮四鄉鎮 建地・農建地待售</h1>
+  <div class="meta" id="meta"></div>
+</header>
+<div class="bar" id="bar"><div class="wrap"><nav class="chips" id="chips" aria-label="鄉鎮"></nav></div></div>
+<main class="wrap">
+  <div class="ctl">
+    <input id="q" type="search" placeholder="搜尋標題、地段、房仲、編號" aria-label="搜尋" enterkeyhint="search" autocomplete="off">
+    <select id="sort" aria-label="排序">
+      <option value="default">排序：編號</option>
+      <option value="priceAsc">總價：低到高</option>
+      <option value="priceDesc">總價：高到低</option>
+      <option value="perAsc">單價：低到高</option>
+      <option value="areaDesc">坪數：大到小</option>
+      <option value="dropDesc">降幅：大到小</option>
+    </select>
+    <button class="tg drop" id="fDrop" aria-pressed="false">降價<span id="nDrop"></span></button>
+    <button class="tg new" id="fNew" aria-pressed="false">新增<span id="nNew"></span></button>
+    <div class="seg" role="group" aria-label="檢視方式">
+      <button type="button" data-v="cards" aria-pressed="false">卡片</button>
+      <button type="button" data-v="table" aria-pressed="false">表格</button>
+    </div>
+  </div>
+  <div class="count" id="count" aria-live="polite"></div>
+  <div id="out"></div>
+</main>
+<button class="top" id="top" type="button" aria-label="回到頂端">↑</button>
+
+<script>
+(function () {
+  'use strict';
+  var D = {"updated": "2026-10-02", "towns": [{"name": "花蓮市", "rows": [{"n": 1, "new": false, "title": "專售市區低總價住宅區建地(含道路用地)", "loc": "德安段，近德安商圈/中原國小", "map": "https://www.google.com/maps/search/花蓮市德安段", "area": "30.25（住宅14.82＋道路15.43）", "areaN": 30.25, "price": 280.0, "per": 9.26, "type": "住宅區建地＋道路用地", "agent": "盧立文／永慶不動產 0915-273-073", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20372743"}], "drop": null, "dropFallback": false}, {"n": 2, "new": false, "title": "站前黃金商圈花蓮商工對面優質建地", "loc": "林森段，距花蓮商校站94m", "map": "https://www.google.com/maps/search/花蓮市林森段花蓮商工", "area": "25.11", "areaN": 25.11, "price": 788.0, "per": 31.38, "type": "住宅區建地", "agent": "有巢氏房屋花蓮謙誠富國加盟店（永慶網編號UE603）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7293742"}], "drop": null, "dropFallback": false}, {"n": 3, "new": false, "title": "建國路中山路口1-2樓稅籍店面建地", "loc": "林森段，建國路×中山路口", "map": "https://www.google.com/maps/search/花蓮市建國路中山路口", "area": "9.38", "areaN": 9.38, "price": 788.0, "per": 84.04, "type": "商二建地＋1-2樓稅籍店面", "agent": "林娟／永慶 0919-909-446", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20482334"}, {"t": "591-B", "u": "https://land.591.com.tw/sale/20736622"}], "drop": null, "dropFallback": false}, {"n": 4, "new": false, "title": "花蓮市商業區小小建地 25D213", "loc": "民生段，商業區", "map": "https://www.google.com/maps/search/花蓮市民生段", "area": "5.44", "areaN": 5.44, "price": 188.0, "per": 34.56, "type": "商業區建地", "agent": "有巢氏房屋花蓮美崙尾川加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7341522"}], "drop": null, "dropFallback": false}, {"n": 5, "new": false, "title": "明禮路方正建地", "loc": "明義段，明禮路，面寬6米", "map": "https://www.google.com/maps/search/花蓮市明禮路", "area": "25.71", "areaN": 25.71, "price": 698.0, "per": 27.15, "type": "建地（住宅）", "agent": "永慶不動產花蓮吉安和平加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7358656"}], "drop": {"amount": "40", "orig": "738", "cur": "698"}, "dropFallback": false}, {"n": 6, "new": false, "title": "市中心未來建地", "loc": "國股段", "map": "https://www.google.com/maps/search/花蓮市國股段", "area": "100", "areaN": 100.0, "price": 400.0, "per": 4.0, "type": "住宅用地/建地", "agent": "陳小姐（地主自售）0972-528-577轉4699003", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20766254"}], "drop": {"amount": "120", "orig": "520", "cur": "400"}, "dropFallback": false}, {"n": 7, "new": false, "title": "南京街建地", "loc": "福安段，南京街336巷5號旁", "map": "https://www.google.com/maps/search/花蓮市南京街", "area": "44.16", "areaN": 44.16, "price": 928.0, "per": 21.01, "type": "住宅用地/建地", "agent": "①邱雅卉／太平洋房屋 0973-515-727 ②永慶不動產花蓮吉安和平加盟店", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20786917"}, {"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6504393"}], "drop": {"amount": "52", "orig": "980", "cur": "928"}, "dropFallback": false}, {"n": 8, "new": false, "title": "市中心和平路建地", "loc": "主權段36號，近遠東百貨", "map": "https://www.google.com/maps/search/花蓮市和平路遠東百貨", "area": "48.4", "areaN": 48.4, "price": 760.0, "per": 15.7, "type": "住宅用地/建地", "agent": "古家銘／永慶 0978-047-788", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20750805"}], "drop": null, "dropFallback": false}, {"n": 9, "new": false, "title": "林森段店面", "loc": "林森段，明智街巷", "map": "https://www.google.com/maps/search/花蓮市林森段明智街", "area": "16.94", "areaN": 16.94, "price": 798.0, "per": 47.11, "type": "住宅用地(含出租中店面)", "agent": "邱小姐／永慶 0930-301-616", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20618315"}], "drop": null, "dropFallback": false}, {"n": 10, "new": true, "title": "花蓮市區近重慶市場、東大門夜市商業區建地", "loc": "民生段", "map": "https://www.google.com/maps/search/花蓮市民生段", "area": "24.8", "areaN": 24.8, "price": 850.0, "per": 34.27, "type": "商業區建地", "agent": "永慶不動產汐止社后福德加盟店（總機 03-8509988）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7531876"}], "drop": null, "dropFallback": false}, {"n": 11, "new": true, "title": "＃花蓮市區 #住宅區小筆建地 #近大遠百商圈", "loc": "林森段", "map": "https://www.google.com/maps/search/花蓮市林森段", "area": "31.76", "areaN": 31.76, "price": 750.0, "per": 23.62, "type": "住宅區建地", "agent": "永慶不動產花蓮中山站前加盟店（總機 03-8509988）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7522285"}], "drop": null, "dropFallback": false}, {"n": 12, "new": true, "title": "美崙方正建地◆可蓋雙車位花園建地 UE630", "loc": "民孝段", "map": "https://www.google.com/maps/search/花蓮市民孝段", "area": "47.8", "areaN": 47.8, "price": 946.0, "per": 19.79, "type": "建地", "agent": "有巢氏房屋花蓮謙誠富國加盟店等共4家仲介刊登", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7496555"}], "drop": null, "dropFallback": false}, {"n": 13, "new": true, "title": "獨家花蓮正市區｜稀有釋出北濱方正地型好規劃", "loc": "北濱段", "map": "https://www.google.com/maps/search/花蓮市北濱段", "area": "9.68", "areaN": 9.68, "price": 298.0, "per": 30.79, "type": "住宅建地", "agent": "永慶不動產花蓮吉安和平加盟店（總機 03-8509988）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7455390"}], "drop": null, "dropFallback": false}, {"n": 14, "new": true, "title": "市中心近闔家歡飯店雙面路建地 14E181", "loc": "主權段", "map": "https://www.google.com/maps/search/花蓮市主權段", "area": "28.13", "areaN": 28.13, "price": 988.0, "per": 35.12, "type": "住宅建地（雙面臨路）", "agent": "①永慶不動產花蓮吉安中山加盟店 ②進豐真好 ③中正悠活 ④自強大聯（均總機 03-8509988）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7291561"}, {"t": "B", "u": "https://buy.yungching.com.tw/house/7273918"}, {"t": "C", "u": "https://buy.yungching.com.tw/house/7230078"}, {"t": "D", "u": "https://buy.yungching.com.tw/house/6799833"}], "drop": {"amount": "192", "orig": null, "cur": null}, "dropFallback": false}, {"n": 15, "new": true, "title": "專任-市區｜小坪數建地 20E166", "loc": "主商段", "map": "https://www.google.com/maps/search/花蓮市主商段", "area": "22.69", "areaN": 22.69, "price": 638.0, "per": 28.12, "type": "建地", "agent": "有巢氏房屋花蓮中華明心加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7219242"}], "drop": null, "dropFallback": false}, {"n": 16, "new": true, "title": "《專售》市區懷舊老宅對面建地 5E1063", "loc": "福安段", "map": "https://www.google.com/maps/search/花蓮市福安段", "area": "37.21", "areaN": 37.21, "price": 744.0, "per": 20.0, "type": "住宅建地", "agent": "永慶不動產花蓮富國加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6532027"}], "drop": null, "dropFallback": false}, {"n": 17, "new": true, "title": "市區低總價保值收租自蓋住宅區建地 9E73", "loc": "福祥段", "map": "https://www.google.com/maps/search/花蓮市福祥段", "area": "21.78", "areaN": 21.78, "price": 268.0, "per": 12.31, "type": "住宅區建地", "agent": "永慶不動產花蓮中山站前加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6163102"}], "drop": {"amount": "30", "orig": "298", "cur": "268"}, "dropFallback": false}, {"n": 18, "new": true, "title": "專任~慈濟大學旁稀有建地 E0199", "loc": "功學段", "map": "https://www.google.com/maps/search/花蓮市功學段慈濟大學", "area": "52.51", "areaN": 52.51, "price": 980.0, "per": 18.66, "type": "住宅建地", "agent": "有巢氏房屋花蓮明禮林森加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6693835"}], "drop": null, "dropFallback": false}, {"n": 19, "new": true, "title": "專任_入駐市中心超低總價建地_優質推薦", "loc": "林森段", "map": "https://www.google.com/maps/search/花蓮市林森段", "area": "20.87", "areaN": 20.87, "price": 566.0, "per": 27.12, "type": "住宅建地", "agent": "永慶不動產花蓮中正悠活加盟店（總機 03-8509988）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7250198"}], "drop": null, "dropFallback": false}, {"n": 20, "new": true, "title": "花蓮市區全新裝潢溫馨稅籍小宅", "loc": "福安段", "map": "https://www.google.com/maps/search/花蓮市福安段", "area": "土地7.26（主建物9.08）", "areaN": 7.26, "price": 368.0, "per": 50.69, "type": "住宅建地＋稅籍小宅", "agent": "永慶不動產花蓮吉安和平加盟店（總機 03-8509988）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7091754"}], "drop": null, "dropFallback": false}, {"n": 21, "new": true, "title": "近東大門夜市稀有釋出方正建地 5E304", "loc": "北濱段", "map": "https://www.google.com/maps/search/花蓮市北濱段", "area": "26.92", "areaN": 26.92, "price": 680.0, "per": 25.26, "type": "住宅建地", "agent": "永慶不動產花蓮富國加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/3766554"}], "drop": {"amount": "12", "orig": "692", "cur": "680"}, "dropFallback": false}]}, {"name": "鳳林鎮", "rows": [{"n": 1, "new": false, "title": "大降200萬！大地坪農建地＋稅籍平房", "loc": "北林段，臨10米路", "map": "https://www.google.com/maps/search/鳳林鎮北林段", "area": "1202", "areaN": 1202.0, "price": 988.0, "per": 0.82, "type": "甲建＋農牧用地＋稅籍平房", "agent": "①陳小姐／有巢氏房屋國安中華店 0921-134-880 ②有巢氏房屋（永慶網）", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20068344"}, {"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6734093"}], "drop": {"amount": "200", "orig": "1188", "cur": "988"}, "dropFallback": false}, {"n": 2, "new": false, "title": "鳳林慢城農地＋建地＋稅籍屋", "loc": "長橋段，距萬榮車站158m", "map": "https://www.google.com/maps/search/鳳林鎮萬森路7巷", "area": "471.9（農308＋甲建164）", "areaN": 471.9, "price": 690.0, "per": 1.46, "type": "農牧＋甲種建地＋稅籍屋", "agent": "①陳惠如／有巢氏 0911-247-666 ②有巢氏國聯商校店 ③永慶進豐真好店 ④有巢氏中華明心店", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20032326"}, {"t": "永慶網A", "u": "https://buy.yungching.com.tw/house/7170347"}, {"t": "B", "u": "https://buy.yungching.com.tw/house/7105289"}, {"t": "C", "u": "https://buy.yungching.com.tw/house/7199958"}], "drop": {"amount": "60", "orig": null, "cur": null}, "dropFallback": false}, {"n": 3, "new": false, "title": "鳳林買農建地送稅籍屋", "loc": "鳳信段，鳳林市區，距火車站866m", "map": "https://www.google.com/maps/search/鳳林鎮鳳信段", "area": "35.17（建21.86＋農13.31）", "areaN": 35.17, "price": 350.0, "per": 9.95, "type": "建地＋農地＋稅籍平房25.86坪", "agent": "①有巢氏房屋謙誠富國店 ②永慶不動產富國店 ③台慶不動產建國欣玉店", "links": [{"t": "永慶網A", "u": "https://buy.yungching.com.tw/house/6619223"}, {"t": "B", "u": "https://buy.yungching.com.tw/house/6307981"}, {"t": "C", "u": "https://buy.yungching.com.tw/house/6307518"}], "drop": null, "dropFallback": false}, {"n": 4, "new": false, "title": "鳳林乙種建地~價好談", "loc": "鳳信段，距鳳林車站721m", "map": "https://www.google.com/maps/search/鳳林鎮鳳信段", "area": "113.67", "areaN": 113.67, "price": 226.0, "per": 1.99, "type": "乙建（鄉村區）", "agent": "①陳惠如／有巢氏 0911-247-666 ②林小姐／永慶 0919-909-446 ③有巢氏明禮林森店 ④永慶德安中華店 ⑤永慶商校誠一店", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20137021"}, {"t": "591-B", "u": "https://land.591.com.tw/sale/20737704"}, {"t": "永慶網A", "u": "https://buy.yungching.com.tw/house/6274900"}, {"t": "B", "u": "https://buy.yungching.com.tw/house/6632882"}, {"t": "C", "u": "https://buy.yungching.com.tw/house/7432672"}], "drop": null, "dropFallback": false}, {"n": 5, "new": false, "title": "專任鳳林面寬建地降價賠售", "loc": "鳳光段，大榮五路，面田園", "map": "https://www.google.com/maps/search/鳳林鎮鳳光段", "area": "93.17", "areaN": 93.17, "price": 480.0, "per": 5.15, "type": "建地", "agent": "①古家銘／永慶 0978-047-788 ②永慶吉安和平店", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20615081"}, {"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7452248"}], "drop": null, "dropFallback": false}, {"n": 6, "new": false, "title": "兆豐農場全新合法資材室", "loc": "林榮段，面寬60米、有自來水", "map": "https://www.google.com/maps/search/鳳林鎮林榮段", "area": "568.87", "areaN": 568.87, "price": 550.0, "per": 0.97, "type": "農地＋合法資材室", "agent": "永慶不動產花蓮中山站前加盟店（專任）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7501345"}], "drop": null, "dropFallback": false}, {"n": 7, "new": false, "title": "喜歡價好談/含合法資材室+曬場", "loc": "南平段", "map": "https://www.google.com/maps/search/鳳林鎮南平段", "area": "941.52", "areaN": 941.52, "price": 799.0, "per": 0.85, "type": "農地＋合法資材室＋合法曬場", "agent": "①曾女士 0989-097-904 ②台慶不動產花蓮建國欣玉店", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20928557"}, {"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6222490"}], "drop": {"amount": "51", "orig": "850", "cur": "799"}, "dropFallback": false}, {"n": 8, "new": true, "title": "鳳林市區99坪大面寬/住宅建地", "loc": "鳳光段，大榮社區", "map": "https://www.google.com/maps/search/鳳林鎮鳳光段", "area": "99.52", "areaN": 99.52, "price": 790.0, "per": 7.94, "type": "住宅用地/建地", "agent": "①尤佳凌／永慶中正仁里店 0922-166-651 ②楊豫萍 0913-270-077 ③永慶吉安站前店、永慶中正仁里店、自強大聯店、有巢氏謙誠富國店", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20861805"}, {"t": "永慶網A", "u": "https://buy.yungching.com.tw/house/7316731"}, {"t": "B", "u": "https://buy.yungching.com.tw/house/7506500"}, {"t": "C", "u": "https://buy.yungching.com.tw/house/7527040"}, {"t": "D", "u": "https://buy.yungching.com.tw/house/7475004"}], "drop": null, "dropFallback": false}, {"n": 9, "new": true, "title": "鳳林市區｜低總價｜渡假休閒｜面寬建地 18E168", "loc": "鳳光段，都內住宅區，距車站5分鐘車程", "map": "https://www.google.com/maps/search/鳳林鎮鳳光段", "area": "104.66", "areaN": 104.66, "price": 458.0, "per": 4.38, "type": "住宅區建地", "agent": "①永慶不動產花蓮中正仁里店 ②台慶不動產高大家樂福店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7528516"}, {"t": "B", "u": "https://buy.yungching.com.tw/house/6384525"}], "drop": null, "dropFallback": false}, {"n": 10, "new": true, "title": "鳳林慢城｜農建地＋稅籍屋｜臨12米路", "loc": "林榮段，近林榮車站", "map": "https://www.google.com/maps/search/鳳林鎮林榮段", "area": "195.31", "areaN": 195.31, "price": 680.0, "per": 3.48, "type": "農建地＋稅籍平房（主建物約44.16坪）", "agent": "①永慶不動產吉安和平店（專任） ②台慶不動產後站綜一店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7526271"}, {"t": "B", "u": "https://buy.yungching.com.tw/house/7521764"}], "drop": null, "dropFallback": false}, {"n": 11, "new": true, "title": "鳳林長橋近台九線乙種建地 UE631", "loc": "長橋段", "map": "https://www.google.com/maps/search/鳳林鎮長橋段", "area": "91.53", "areaN": 91.53, "price": 275.0, "per": 3.0, "type": "乙種建地", "agent": "有巢氏房屋花蓮謙誠富國加盟店（專任）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7510785"}], "drop": null, "dropFallback": false}, {"n": 12, "new": true, "title": "專任-稀有特色建築用地 20E227", "loc": "水車段", "map": "https://www.google.com/maps/search/鳳林鎮水車段", "area": "134.01", "areaN": 134.01, "price": 494.0, "per": 3.69, "type": "建築用地", "agent": "有巢氏房屋（永慶網刊登）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7514126"}], "drop": null, "dropFallback": false}, {"n": 13, "new": true, "title": "獨家專任鳳林慢城一村建地退休慢活好選擇", "loc": "鳳光段", "map": "https://www.google.com/maps/search/鳳林鎮鳳光段", "area": "88.63", "areaN": 88.63, "price": 650.0, "per": 7.33, "type": "建地", "agent": "永慶不動產花蓮吉安和平加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7454131"}], "drop": null, "dropFallback": false}, {"n": 14, "new": true, "title": "鳳林鎮雙面路面寬建地 18E163", "loc": "鳳光段", "map": "https://www.google.com/maps/search/鳳林鎮鳳光段", "area": "117.98", "areaN": 117.98, "price": 738.0, "per": 6.26, "type": "建地（部分為國產承租地）", "agent": "永慶不動產花蓮中正仁里加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7477710"}], "drop": null, "dropFallback": false}, {"n": 15, "new": true, "title": "獨家鳳林甲建｜131坪建地｜退休養生首選基地", "loc": "水車段", "map": "https://www.google.com/maps/search/鳳林鎮水車段", "area": "131.90", "areaN": 131.9, "price": 598.0, "per": 4.53, "type": "甲種建築用地", "agent": "永慶不動產花蓮吉安和平加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7432801"}], "drop": null, "dropFallback": false}, {"n": 16, "new": true, "title": "近鳳林車站臨路方正優質美建地", "loc": "鳳明段", "map": "https://www.google.com/maps/search/鳳林鎮鳳明段", "area": "81.07", "areaN": 81.07, "price": 368.0, "per": 4.54, "type": "建地", "agent": "永慶不動產花蓮重劃和平加盟店（弘威）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7465058"}], "drop": null, "dropFallback": false}, {"n": 17, "new": true, "title": "獨家專任/鳳林林榮/優質地形/鄉村建地", "loc": "林榮段", "map": "https://www.google.com/maps/search/鳳林鎮林榮段", "area": "159.94", "areaN": 159.94, "price": 832.0, "per": 5.2, "type": "鄉村建地", "agent": "永慶不動產花蓮吉安和平加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7348471"}], "drop": null, "dropFallback": false}, {"n": 18, "new": true, "title": "花蓮鳳林慢活農村近台九線雙面路建地", "loc": "北林段", "map": "https://www.google.com/maps/search/鳳林鎮北林段", "area": "130.97", "areaN": 130.97, "price": 697.0, "per": 5.32, "type": "建地（雙面臨路）", "agent": "永慶不動產花蓮吉安和平加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7325036"}], "drop": {"amount": "36", "orig": "733", "cur": "697"}, "dropFallback": false}, {"n": 19, "new": true, "title": "花蓮建地鳳林鎮方正建地面寬27米臨路5米", "loc": "北林段", "map": "https://www.google.com/maps/search/鳳林鎮北林段", "area": "272.11", "areaN": 272.11, "price": 928.0, "per": 3.41, "type": "建地", "agent": "①永慶不動產花蓮中山站前店 ②有巢氏房屋花蓮中央中原店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6916731"}, {"t": "B", "u": "https://buy.yungching.com.tw/house/7284154"}], "drop": {"amount": "102", "orig": null, "cur": null}, "dropFallback": false}, {"n": 20, "new": true, "title": "鳳林千萬內！北林國小旁近台九線景觀建地", "loc": "北林段", "map": "https://www.google.com/maps/search/鳳林鎮北林段", "area": "213.64", "areaN": 213.64, "price": 897.0, "per": 4.2, "type": "建地", "agent": "①永慶不動產吉安和平店 ②有巢氏中華明心店 ③有巢氏東大門重慶店 ④有巢氏謙誠富國店", "links": [{"t": "永慶網A", "u": "https://buy.yungching.com.tw/house/7146168"}, {"t": "B", "u": "https://buy.yungching.com.tw/house/7223833"}, {"t": "C", "u": "https://buy.yungching.com.tw/house/7203179"}, {"t": "D", "u": "https://buy.yungching.com.tw/house/6801482"}], "drop": {"amount": "101", "orig": null, "cur": null}, "dropFallback": false}, {"n": 21, "new": true, "title": "專售慢活鳳林養身村大榮國小旁建地已申請建築線通行", "loc": "大榮段", "map": "https://www.google.com/maps/search/鳳林鎮大榮段", "area": "140.50", "areaN": 140.5, "price": 588.0, "per": 4.19, "type": "住宅建地", "agent": "永慶不動產花蓮吉安和平加盟店（弘天）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6647578"}], "drop": null, "dropFallback": false}, {"n": 22, "new": true, "title": "(專)讚炭工坊山景美建地 15E033", "loc": "鳳義段", "map": "https://www.google.com/maps/search/鳳林鎮鳳義段", "area": "171.17", "areaN": 171.17, "price": 595.0, "per": 3.48, "type": "建地", "agent": "永慶不動產花蓮吉安站前加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/5476471"}], "drop": null, "dropFallback": false}, {"n": 23, "new": true, "title": "專任鄉村恬靜買土地與原屋況平房", "loc": "鳳明段", "map": "https://www.google.com/maps/search/鳳林鎮鳳明段", "area": "237.46（主建物13.82）", "areaN": 237.46, "price": 690.0, "per": 2.91, "type": "農地＋平房", "agent": "永慶不動產花蓮中正悠活加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7464320"}], "drop": {"amount": "100", "orig": "790", "cur": "690"}, "dropFallback": false}, {"n": 24, "new": true, "title": "花蓮靠近鳳林國小2房稅籍屋釋出", "loc": "鳳明段，近鳳林火車站", "map": "https://www.google.com/maps/search/鳳林鎮鳳明段", "area": "60.20", "areaN": 60.2, "price": 358.0, "per": 5.95, "type": "住宅建地＋2房稅籍屋", "agent": "永慶不動產花蓮重劃和平加盟店（弘威）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7465085"}], "drop": null, "dropFallback": false}, {"n": 25, "new": true, "title": "獨家專售鳳林大榮稅籍屋極致休閒慢活好地方", "loc": "鳳信段，大榮", "map": "https://www.google.com/maps/search/鳳林鎮鳳信段大榮", "area": "817.96（主建物12.10）", "areaN": 817.96, "price": 495.0, "per": 0.61, "type": "農地＋稅籍屋", "agent": "永慶不動產花蓮吉安和平加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6583423"}], "drop": {"amount": "55", "orig": "550", "cur": "495"}, "dropFallback": false}, {"n": 26, "new": true, "title": "專任_鳳林大農地小平房_優質好案推薦", "loc": "榮開段", "map": "https://www.google.com/maps/search/鳳林鎮榮開段", "area": "778.03", "areaN": 778.03, "price": 585.0, "per": 0.75, "type": "農地＋約20坪鋼構簡屋", "agent": "永慶不動產花蓮中正悠活加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7217447"}], "drop": null, "dropFallback": false}, {"n": 27, "new": true, "title": "專任鳳林合法資材室｜有電&有水井｜近台九線農地", "loc": "中心埔段", "map": "https://www.google.com/maps/search/鳳林鎮中心埔段", "area": "1503.42", "areaN": 1503.42, "price": 598.0, "per": 0.4, "type": "農地＋合法資材室", "agent": "永慶不動產花蓮吉安和平加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7294809"}], "drop": {"amount": "90", "orig": "688", "cur": "598"}, "dropFallback": false}, {"n": 28, "new": true, "title": "鳳林稀有都市計畫區建地/近鳳仁國小、台9線", "loc": "鳳仁段，面寬約5米×深約16米、臨約3米路", "map": "https://www.google.com/maps/search/鳳林鎮鳳仁段", "area": "28.74", "areaN": 28.74, "price": 300.0, "per": 10.44, "type": "都市計畫區建地", "agent": "永慶不動產花蓮進豐真好加盟店", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7483899"}], "drop": null, "dropFallback": false}]}, {"name": "壽豐鄉", "rows": [{"n": 1, "new": false, "title": "東華教授村三面路建地（東安教授村美式別墅社區）", "loc": "萬壽段一小段", "map": "https://www.google.com/maps/search/壽豐鄉東安社區", "area": "66.5", "areaN": 66.5, "price": 688.0, "per": 10.3, "type": "住/建", "agent": "悠活房屋／永慶中正悠活加盟店 03-8509988轉15805（原591仲介：陳鳴／永慶 0911-305-578）", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7261811"}], "drop": null, "dropFallback": false}, {"n": 2, "new": false, "title": "東安社區大建地", "loc": "萬壽段一小段", "map": "https://www.google.com/maps/search/壽豐鄉東安社區", "area": "97", "areaN": 97.0, "price": 963.0, "per": 9.93, "type": "乙建（鄉村區）", "agent": "林偉彬／悠活地產 0939-932-222", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20740325"}], "drop": null, "dropFallback": false}, {"n": 3, "new": false, "title": "專任近台九線・壽豐車站建地", "loc": "共和段，距壽豐車站291m", "map": "https://www.google.com/maps/search/壽豐火車站", "area": "72.32", "areaN": 72.32, "price": 728.0, "per": 10.07, "type": "農建地（都市農業區）", "agent": "藍小姐／永慶 0955-257-791", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20496330"}], "drop": null, "dropFallback": false}, {"n": 4, "new": false, "title": "專任大面寬建地釋出", "loc": "光榮段", "map": "https://www.google.com/maps/search/壽豐鄉光榮段", "area": "144.96", "areaN": 144.96, "price": 880.0, "per": 6.07, "type": "建地（都市農業區）", "agent": "藍小姐／永慶 0955-257-791", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20496409"}], "drop": null, "dropFallback": false}, {"n": 5, "new": false, "title": "東華大學旁住宅建地", "loc": "志平段，臨20米路", "map": "https://www.google.com/maps/search/壽豐鄉志學村東華大學", "area": "201", "areaN": 201.0, "price": 342.0, "per": 1.7, "type": "住宅區", "agent": "姜小姐／全國不動產 0988-354-290", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20008682"}], "drop": null, "dropFallback": false}, {"n": 6, "new": false, "title": "壽豐老街低總價小坪數建地", "loc": "政明段94地號", "map": "https://www.google.com/maps/search/壽豐鄉壽豐路一段", "area": "42.8", "areaN": 42.8, "price": 350.0, "per": 8.18, "type": "住宅區", "agent": "①林先生／有巢氏 0925-107-705 ②陳鳴／永慶 0911-305-578", "links": [{"t": "591-A", "u": "https://land.591.com.tw/sale/20528373"}, {"t": "591-B", "u": "https://land.591.com.tw/sale/20405631"}], "drop": null, "dropFallback": false}, {"n": 7, "new": false, "title": "豐裡社區方正建地161.3坪（可建4戶）", "loc": "豐裡段，面寬18.6m×深27.6m", "map": "https://www.google.com/maps/search/壽豐鄉豐裡段", "area": "161.27", "areaN": 161.27, "price": 880.0, "per": 5.46, "type": "住宅區（都市）", "agent": "魏吉兒 0925-085-303、黃賦源 0912-522-974／太平洋房屋", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20087232"}], "drop": {"amount": "88", "orig": "968", "cur": "880"}, "dropFallback": false}, {"n": 8, "new": false, "title": "花蓮乙種建築用地（東升段）", "loc": "東升段", "map": "https://www.google.com/maps/search/壽豐鄉東升段", "area": "242.6", "areaN": 242.6, "price": 850.0, "per": 3.5, "type": "乙建（鄉村區）", "agent": "蔡彬彬／太平洋房屋 0980-105-115", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20012651"}], "drop": null, "dropFallback": false}, {"n": 9, "new": false, "title": "壽豐正台九線旁甲種建地", "loc": "溪口段", "map": "https://www.google.com/maps/search/壽豐鄉溪口段台9線", "area": "41.61", "areaN": 41.61, "price": 258.0, "per": 6.2, "type": "甲建（一般農業區）", "agent": "吳先生／尚芳不動產 0965-270-507", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20196658"}], "drop": null, "dropFallback": false}, {"n": 10, "new": false, "title": "近壽豐車站農建地", "loc": "壽農段0055-0001地號", "map": "https://www.google.com/maps/search/壽豐鄉壽農段", "area": "78.08", "areaN": 78.08, "price": 780.0, "per": 9.99, "type": "都市住宅區（法定農業用）", "agent": "謝小姐／上凰不動產 0985-799-302", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20502086"}], "drop": null, "dropFallback": false}, {"n": 11, "new": false, "title": "壽豐~農地＋建地（志新段）", "loc": "志新段228地號", "map": "https://www.google.com/maps/search/壽豐鄉志新段", "area": "91（建29.32＋農62）", "areaN": 91.0, "price": 398.0, "per": 4.37, "type": "住宅區＋農業區", "agent": "①林煥紋／立程開發、有巢氏東大門重慶店 0960-000-005、03-8360-005 ②遠東房屋 0921-974-939、03-8565500", "links": [{"t": "591-A", "u": "https://land.591.com.tw/sale/20811635"}, {"t": "591-B", "u": "https://land.591.com.tw/sale/19985819"}], "drop": {"amount": "100", "orig": "498", "cur": "398"}, "dropFallback": false}, {"n": 12, "new": false, "title": "月眉193旁稀有農建地有稅籍屋", "loc": "下月段", "map": "https://www.google.com/maps/search/壽豐鄉月眉193縣道", "area": "258.29（農牧225.4＋丙建32.9）", "areaN": 258.29, "price": 450.0, "per": 1.74, "type": "山坡地保育區丙建＋農牧＋稅籍屋", "agent": "陳惠如／有巢氏 0911-247-666", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20184130"}], "drop": null, "dropFallback": false}, {"n": 13, "new": false, "title": "壽豐方正建地121坪夢想美地", "loc": "豐南段", "map": "https://www.google.com/maps/search/壽豐鄉豐南段", "area": "121.7", "areaN": 121.7, "price": 238.0, "per": 1.96, "type": "住宅用地(甲種建築用地)", "agent": "陳美如／有巢氏房屋 0921-134-880", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20653757"}], "drop": {"amount": "60", "orig": "298", "cur": "238"}, "dropFallback": false}, {"n": 14, "new": true, "title": "專任~壽豐月眉面寬一戶建專用建地", "loc": "壽月段（月眉）", "map": "https://www.google.com/maps/search/壽豐鄉月眉壽月段", "area": "56.46", "areaN": 56.46, "price": 268.0, "per": 4.75, "type": "乙建（鄉村區）住宅用地", "agent": "①陳鳴／永慶嘉新不動產 0911-305-578 ②沈淑芬／永慶嘉新不動產 0928-095-448、03-8536008", "links": [{"t": "591-A", "u": "https://land.591.com.tw/sale/20888074"}, {"t": "591-B", "u": "https://land.591.com.tw/sale/20876879"}], "drop": null, "dropFallback": false}, {"n": 15, "new": true, "title": "獨家-壽豐百坪鄉村建地", "loc": "壽農段，距豐田站約759m", "map": "https://www.google.com/maps/search/壽豐鄉壽農段", "area": "110.37", "areaN": 110.37, "price": 760.0, "per": 6.89, "type": "乙建（鄉村區）", "agent": "黃小姐／有巢氏房屋 0975-603-398", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20846852"}], "drop": null, "dropFallback": false}, {"n": 16, "new": true, "title": "花蓮壽豐農建地（壽山段）", "loc": "壽山段，距光榮站約354m", "map": "https://www.google.com/maps/search/壽豐鄉壽山段", "area": "141.82（建44.18＋農97.64）", "areaN": 141.82, "price": 298.0, "per": 2.1, "type": "乙建＋農牧用地（鄉村區）", "agent": "花蓮興聯陽房屋企業社 03-8351308", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20839138"}], "drop": null, "dropFallback": false}, {"n": 17, "new": true, "title": "專售-壽豐鄉村寧靜社區建地", "loc": "壽月段", "map": "https://www.google.com/maps/search/壽豐鄉月眉壽月段", "area": "60.08", "areaN": 60.08, "price": 322.0, "per": 5.36, "type": "鄉村乙種建地", "agent": "有巢氏房屋花蓮中央中原加盟店（馬以不動產）03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7497539"}], "drop": null, "dropFallback": false}, {"n": 18, "new": true, "title": "花蓮鯉魚潭風景區稀有97坪建地", "loc": "池南段", "map": "https://www.google.com/maps/search/壽豐鄉池南段鯉魚潭", "area": "97.56", "areaN": 97.56, "price": 980.0, "per": 10.05, "type": "建地", "agent": "日興不動產／永慶五結中正加盟店 03-9699988轉17214", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7322673"}], "drop": null, "dropFallback": false}, {"n": 19, "new": true, "title": "壽豐台11丙旁近雲山水方正建地", "loc": "豐東段", "map": "https://www.google.com/maps/search/壽豐鄉豐東段", "area": "147.2", "areaN": 147.2, "price": 950.0, "per": 6.45, "type": "建地", "agent": "永慶吉安和平加盟店（弘天不動產）03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7226861"}], "drop": null, "dropFallback": false}, {"n": 20, "new": true, "title": "誠自售豐田站旁小農地送建物（出價都談）", "loc": "大坪段696地號，距豐坪南站約545m", "map": "https://www.google.com/maps/search/壽豐鄉大坪段", "area": "251.08", "areaN": 251.08, "price": 591.0, "per": 2.35, "type": "一般農業區農牧用地＋房屋（1房1廳1廚2衛＋閣樓）", "agent": "劉先生（地主自售）0988-222-737", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20725533"}], "drop": null, "dropFallback": false}, {"n": 21, "new": true, "title": "鯉魚潭南側足坪農地＋稅籍木屋", "loc": "潭南段", "map": "https://www.google.com/maps/search/壽豐鄉鯉魚潭潭南", "area": "768", "areaN": 768.0, "price": 208.0, "per": 0.27, "type": "山坡地保育區農牧用地＋稅籍木屋＋貨櫃", "agent": "黃先生／雙鋐不動產 0928-569-018", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20668897"}], "drop": null, "dropFallback": false}, {"n": 22, "new": true, "title": "月眉林間小屋農地1001坪", "loc": "下月段（月眉路二段）", "map": "https://www.google.com/maps/search/壽豐鄉下月段月眉路二段", "area": "1001", "areaN": 1001.0, "price": 880.0, "per": 0.88, "type": "山坡地保育區農牧用地＋稅籍屋、淋浴間等設施", "agent": "廖小姐／有巢氏房屋 0958-801-365", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20597711"}], "drop": null, "dropFallback": false}, {"n": 23, "new": true, "title": "壽豐慢活愜意平房（農舍）", "loc": "民權街", "map": "https://www.google.com/maps/search/壽豐鄉民權街", "area": "土地約205.7（建物28.27）", "areaN": 205.7, "price": 698.0, "per": 3.39, "type": "農舍（農地含1樓平房，屋齡約45.7年）", "agent": "永慶吉安和平加盟店（弘天不動產）03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7171183"}], "drop": {"amount": "52", "orig": "750", "cur": "698"}, "dropFallback": false}, {"n": 24, "new": true, "title": "花蓮壽豐近鯉魚潭露營區買地送度假屋", "loc": "池南段", "map": "https://www.google.com/maps/search/壽豐鄉池南段鯉魚潭", "area": "98.62", "areaN": 98.62, "price": 520.0, "per": 5.27, "type": "土地＋稅籍屋", "agent": "永慶吉安和平加盟店（弘天不動產）03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6004263"}], "drop": {"amount": "145", "orig": "665", "cur": "520"}, "dropFallback": false}, {"n": 25, "new": true, "title": "鹽寮無敵海景萬用稅籍適合店住", "loc": "東明段（鹽寮）", "map": "https://www.google.com/maps/search/壽豐鄉鹽寮東明段", "area": "土地15.12（建物53.98）", "areaN": 15.12, "price": 950.0, "per": 62.83, "type": "風景區丙種建築用地＋稅籍屋", "agent": "永慶吉安和平加盟店（弘天不動產）03-8509988轉37571", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7015492"}], "drop": {"amount": "48", "orig": "998", "cur": "950"}, "dropFallback": false}]}, {"name": "吉安鄉", "rows": [{"n": 1, "new": false, "title": "花蓮農校住宅建地~送稅籍平房", "loc": "慈惠段370巷", "map": "https://www.google.com/maps/search/吉安鄉慈惠段", "area": "56.83", "areaN": 56.83, "price": 680.0, "per": 11.97, "type": "住一＋稅籍平房", "agent": "徐小姐／東森房屋 0933-481-960", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20461233"}], "drop": {"amount": "80", "orig": "760", "cur": "680"}, "dropFallback": false}, {"n": 2, "new": false, "title": "吉安統冠旁機能方正大面寬建地〈原保〉", "loc": "福興段，近上騰高商站91m", "map": "https://www.google.com/maps/search/吉安鄉福興段統冠", "area": "39.33", "areaN": 39.33, "price": 498.0, "per": 12.66, "type": "住宅區＋原住民保留地", "agent": "①溫小姐／永慶 0927-767-677 ②值班小姐", "links": [{"t": "591-A", "u": "https://land.591.com.tw/sale/19764299"}, {"t": "591-B", "u": "https://land.591.com.tw/sale/20468351"}], "drop": null, "dropFallback": false}, {"n": 3, "new": false, "title": "吉安近黃昏市場面寬機能建地", "loc": "宜安段（昌隆二街），距吉安車站500m", "map": "https://www.google.com/maps/search/吉安鄉昌隆二街", "area": "21.47", "areaN": 21.47, "price": 336.0, "per": 15.65, "type": "住宅區", "agent": "戴小姐／永慶 0915-473-473", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20057393"}], "drop": null, "dropFallback": false}, {"n": 4, "new": false, "title": "近吉安火車站小坪數建地", "loc": "宜安段216地號", "map": "https://www.google.com/maps/search/吉安火車站", "area": "12.4", "areaN": 12.4, "price": 159.0, "per": 12.8, "type": "建地（都市）", "agent": "①黃小姐／有巢氏 0972-125-492 ②楊女士／有巢氏房屋花蓮明禮林森加盟店 0936-997-668", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20337287"}, {"t": "591-B", "u": "https://land.591.com.tw/sale/20882086"}], "drop": null, "dropFallback": false}, {"n": 5, "new": false, "title": "慶豐段有建物平房（吉安國中旁）", "loc": "慶豐段，面寬7.1m×深31m", "map": "https://www.google.com/maps/search/吉安鄉吉安國中", "area": "105.87", "areaN": 105.87, "price": 890.0, "per": 8.41, "type": "住宅區＋平房", "agent": "陳鳴／永慶中正仁里店 0911-305-578", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20322773"}], "drop": null, "dropFallback": false}, {"n": 6, "new": false, "title": "花蓮吉安稀有建地（永興段）", "loc": "永興段", "map": "https://www.google.com/maps/search/吉安鄉永興段", "area": "54.99", "areaN": 54.99, "price": 798.0, "per": 14.51, "type": "乙建（鄉村區）", "agent": "蕭小姐／北大房屋 0932-565-439", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20287649"}], "drop": null, "dropFallback": false}, {"n": 7, "new": false, "title": "吉安小坪數建地（福吉段）", "loc": "福吉段，距福興站365m", "map": "https://www.google.com/maps/search/吉安鄉福吉段", "area": "43.83", "areaN": 43.83, "price": 833.0, "per": 19.0, "type": "都市農業區（農建地）", "agent": "吳先生／尚芳不動產 0965-270-507", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20063227"}], "drop": null, "dropFallback": false}, {"n": 8, "new": false, "title": "吉安悠閒建地隱藏巷弄一片天", "loc": "仁義段，臨8米路", "map": "https://www.google.com/maps/search/吉安鄉仁義段", "area": "27.83", "areaN": 27.83, "price": 338.0, "per": 12.15, "type": "住宅區", "agent": "安小姐／永慶 0965-002-180", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20045839"}], "drop": null, "dropFallback": false}, {"n": 9, "new": false, "title": "專任輕鬆擁有開心農場", "loc": "東昌段", "map": "https://www.google.com/maps/search/吉安鄉東昌段", "area": "100.7", "areaN": 100.7, "price": 580.0, "per": 5.76, "type": "農地＋36坪稅籍小屋", "agent": "周先生 0938-152-922", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20431248"}], "drop": null, "dropFallback": false}, {"n": 10, "new": false, "title": "退休慢活首選田園旁甲建", "loc": "五十甲段", "map": "https://www.google.com/maps/search/吉安鄉五十甲段", "area": "53.48", "areaN": 53.48, "price": 480.0, "per": 8.98, "type": "甲種建築用地", "agent": "雙先生／永慶 0965-002-180", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20653248"}], "drop": null, "dropFallback": false}, {"n": 11, "new": false, "title": "土地面積方正", "loc": "慶豐段", "map": "https://www.google.com/maps/search/吉安鄉慶豐段", "area": "42.65", "areaN": 42.65, "price": 860.0, "per": 20.16, "type": "住宅用地/建地", "agent": "楊先生（地主自售）0972-528-577轉4673641", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20566442"}], "drop": null, "dropFallback": false}, {"n": 12, "new": false, "title": "秧悅渡假酒店旁超美農地", "loc": "初音段", "map": "https://www.google.com/maps/search/吉安鄉初音段", "area": "259", "areaN": 259.0, "price": 938.0, "per": 3.62, "type": "農牧用地＋稅籍屋", "agent": "林煥紋 0960-000-005", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20196292"}], "drop": null, "dropFallback": false}, {"n": 13, "new": true, "title": "雙面臨路/角地/臨12米大道/面寬建地", "loc": "慶豐段，近灣好行站488m", "map": "https://www.google.com/maps/search/吉安鄉慶豐段", "area": "28.73", "areaN": 28.73, "price": 624.0, "per": 21.72, "type": "都市住宅區建地（建蔽/容積60%/200%，可建約57坪）", "agent": "藍小姐／永慶 0955-257-791", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20811992"}], "drop": null, "dropFallback": false}, {"n": 14, "new": true, "title": "吉安農地+全新有權狀農需室", "loc": "仁愛段", "map": "https://www.google.com/maps/search/吉安鄉仁愛段", "area": "123（農需室13.61）", "areaN": 123.0, "price": 660.0, "per": 5.37, "type": "一般農業區農牧用地＋RC農需室（112/12完工，有權狀）", "agent": "曾女士 0989-097-904", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20928757"}], "drop": {"amount": "28", "orig": "688", "cur": "660"}, "dropFallback": false}, {"n": 15, "new": true, "title": "藍天綠地小洋房｜果園庭院、電水齊全", "loc": "光英段", "map": "https://www.google.com/maps/search/吉安鄉光英段", "area": "254", "areaN": 254.0, "price": 630.0, "per": 2.48, "type": "一般農業區農牧用地＋稅籍建物約12.41坪（屋齡約3年）", "agent": "林先生／永慶 0939-932-222", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20152704"}], "drop": null, "dropFallback": false}, {"n": 16, "new": true, "title": "光華一街甲建雙併平房農舍", "loc": "光華一街", "map": "https://www.google.com/maps/search/吉安鄉光華一街", "area": "土地45.38（建物23.03）", "areaN": 45.38, "price": 958.0, "per": 21.11, "type": "甲種建築用地＋雙併平房農舍", "agent": "永慶不動產吉安中山加盟店／雙鋐不動產 03-8509988轉33661", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7079522"}], "drop": {"amount": "100", "orig": "1058", "cur": "958"}, "dropFallback": false}]}, {"name": "新城鄉", "rows": [{"n": 1, "new": false, "title": "出價就談~花蓮農地台九線旁千坪土地都內農地", "loc": "興海段，臨12米路", "map": "https://www.google.com/maps/search/新城鄉興海段", "area": "1047.6", "areaN": 1047.6, "price": 998.0, "per": 0.95, "type": "都內農地", "agent": "劉若亞 0932-520-891", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20263932"}], "drop": null, "dropFallback": false}, {"n": 2, "new": false, "title": "專售正台九線大路邊小筆都內農地", "loc": "興海段1401地號", "map": "https://www.google.com/maps/search/新城鄉興海段", "area": "311.1", "areaN": 311.1, "price": 598.0, "per": 1.92, "type": "都內農地", "agent": "①林小姐／永慶 0919-909-446 ②永慶吉安和平加盟店／弘天不動產 03-8509988", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20729655"}, {"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7451977"}], "drop": {"amount": "100", "orig": "698", "cur": "598"}, "dropFallback": false}, {"n": 3, "new": false, "title": "永慶林娟推薦美崙靠近海星高中後方都內農地", "loc": "嘉新段", "map": "https://www.google.com/maps/search/新城鄉嘉新段", "area": "304", "areaN": 304.0, "price": 420.0, "per": 1.39, "type": "都內農地", "agent": "①林小姐／永慶 0919-909-446 ②永慶吉安和平加盟店／弘天不動產（專任）03-8509988", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20469140"}, {"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7438856"}], "drop": {"amount": "60", "orig": "480", "cur": "420"}, "dropFallback": false}, {"n": 4, "new": false, "title": "新城煙波二館旁-都內農地", "loc": "草林段", "map": "https://www.google.com/maps/search/新城鄉草林段", "area": "598", "areaN": 598.0, "price": 717.0, "per": 1.2, "type": "都內農地", "agent": "遠東房屋 0921-974-939、03-8565500", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20400218"}], "drop": null, "dropFallback": false}, {"n": 5, "new": false, "title": "新城鄉興海段-都內農地", "loc": "興海段", "map": "https://www.google.com/maps/search/新城鄉興海段", "area": "578", "areaN": 578.0, "price": 566.0, "per": 0.98, "type": "都內農地", "agent": "①王先生 0911-610-456、03-8565500 ②曾小姐 ③永慶吉安和平加盟店／弘天、永慶吉安站前加盟店 03-8509988", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20399982"}, {"t": "591另筆", "u": "https://land.591.com.tw/sale/20726538"}, {"t": "永慶網-A", "u": "https://buy.yungching.com.tw/house/7102154"}, {"t": "永慶網-B", "u": "https://buy.yungching.com.tw/house/6855032"}], "drop": {"amount": "289", "orig": null, "cur": null}, "dropFallback": false}, {"n": 6, "new": false, "title": "專售海星高中旁臨20米路都內農地", "loc": "嘉新段", "map": "https://www.google.com/maps/search/新城鄉嘉新段海星中學", "area": "15.42", "areaN": 15.42, "price": 498.0, "per": 32.3, "type": "都內農地（有稅籍屋）", "agent": "盧立文 0915-273-073", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20493055"}], "drop": null, "dropFallback": false}, {"n": 7, "new": false, "title": "獨家北埔近家樂福稀有小筆建地買地送屋", "loc": "嘉平段", "map": "https://www.google.com/maps/search/新城鄉嘉平段", "area": "39.02", "areaN": 39.02, "price": 538.0, "per": 13.79, "type": "建地（住宅區）＋買地送屋", "agent": "①值班人員／永慶 0981-487-677 ②永慶中山站前加盟店 03-8509988", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20431606"}, {"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7345159"}], "drop": null, "dropFallback": false}, {"n": 8, "new": false, "title": "近7-11超值價北埔優質生活機能住宅區建地", "loc": "北埔家樂福住宅區", "map": "https://www.google.com/maps/search/新城鄉北埔家樂福", "area": "32.97", "areaN": 32.97, "price": 460.0, "per": 13.95, "type": "住宅用地／建地", "agent": "永慶吉安和平加盟店／弘天不動產 03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7207818"}], "drop": null, "dropFallback": false}, {"n": 9, "new": false, "title": "花蓮新城農地_蓋農舍的好所在", "loc": "佳東段", "map": "https://www.google.com/maps/search/新城鄉佳東段", "area": "842.24", "areaN": 842.24, "price": 716.0, "per": 0.85, "type": "農地（可蓋農舍）", "agent": "黃松御 0966-820-729", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20078026"}], "drop": null, "dropFallback": false}, {"n": 10, "new": false, "title": "新城曼波海灘合法資材室（有權狀）", "loc": "草林段，近曼波海灘／北三棧", "map": "https://www.google.com/maps/search/新城鄉曼波海灘", "area": "303.21", "areaN": 303.21, "price": 688.0, "per": 2.27, "type": "農地＋合法資材室6.05坪", "agent": "①遠東房屋 值班人員 0911-610-456 ②曾小姐 0989-097-904 ③永慶吉安和平加盟店／弘天、有巢氏美崙尾川店、永慶和平成功店 03-8509988", "links": [{"t": "591-A", "u": "https://land.591.com.tw/sale/20759110"}, {"t": "591-B", "u": "https://land.591.com.tw/sale/20928695"}, {"t": "永慶網-A", "u": "https://buy.yungching.com.tw/house/7114013"}, {"t": "永慶網-B", "u": "https://buy.yungching.com.tw/house/6531825"}, {"t": "永慶網-C", "u": "https://buy.yungching.com.tw/house/6618535"}], "drop": {"amount": "90", "orig": null, "cur": null}, "dropFallback": false}, {"n": 11, "new": false, "title": "台九線旁小農地｜投資自用兩相宜", "loc": "順安段，台九線旁", "map": "https://www.google.com/maps/search/新城鄉順安段", "area": "90.48", "areaN": 90.48, "price": 208.0, "per": 2.3, "type": "農地", "agent": "有巢氏房屋花蓮中華明心加盟店 03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7389136"}], "drop": null, "dropFallback": false}, {"n": 12, "new": false, "title": "台慶新城住宅區建地", "loc": "嘉平段，臨6米路", "map": "https://www.google.com/maps/search/新城鄉嘉平段", "area": "28.74", "areaN": 28.74, "price": 418.0, "per": 14.54, "type": "建地（都市住宅區）", "agent": "①曾小姐 03-8563667 ②沈淑芬／永慶 0928-095-448 ③阮小姐／永慶 0989-969-558 ④永慶自強大聯加盟店、台慶建國欣玉加盟店 03-8509988", "links": [{"t": "591-A", "u": "https://land.591.com.tw/sale/20726616"}, {"t": "591-B", "u": "https://land.591.com.tw/sale/20670237"}, {"t": "591-C", "u": "https://land.591.com.tw/sale/20900727"}, {"t": "永慶網-A", "u": "https://buy.yungching.com.tw/house/7066682"}, {"t": "永慶網-B", "u": "https://buy.yungching.com.tw/house/7084951"}], "drop": {"amount": "40", "orig": null, "cur": null}, "dropFallback": false}, {"n": 13, "new": false, "title": "新城漫波海灘都內農地", "loc": "興海段", "map": "https://www.google.com/maps/search/新城鄉曼波海灘", "area": "606.27", "areaN": 606.27, "price": 909.0, "per": 15.0, "type": "都內農地", "agent": "江小姐／住商 0933-486-023", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20622903"}], "drop": null, "dropFallback": false}, {"n": 14, "new": true, "title": "新城嘉南段住宅區建地", "loc": "嘉南段，臨8米路", "map": "https://www.google.com/maps/search/新城鄉嘉南段", "area": "37.51", "areaN": 37.51, "price": 750.0, "per": 20.0, "type": "都市住宅區建地（民有土地，非原保）", "agent": "李俊德／明心地產 0933-277-505", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/20907207"}], "drop": null, "dropFallback": false}, {"n": 15, "new": true, "title": "新城近太魯閣站｜面寬方正臨12米路｜商業區建地", "loc": "新興段，太魯閣車站步行約3分鐘", "map": "https://www.google.com/maps/search/新城鄉新興段太魯閣車站", "area": "60.06", "areaN": 60.06, "price": 598.0, "per": 9.96, "type": "商業區建地", "agent": "永慶吉安和平加盟店／弘天不動產（專簽）03-8509988", "links": [{"t": "永慶網-A", "u": "https://buy.yungching.com.tw/house/7467961"}, {"t": "永慶網-B", "u": "https://buy.yungching.com.tw/house/7499874"}], "drop": {"amount": "110", "orig": "708", "cur": "598"}, "dropFallback": false}, {"n": 16, "new": true, "title": "台九線上伴手禮店面最佳地點有稅籍屋之建地", "loc": "山廣段，台九線上", "map": "https://www.google.com/maps/search/新城鄉山廣段", "area": "69.05（稅籍屋15.31）", "areaN": 69.05, "price": 898.0, "per": 13.0, "type": "建地＋稅籍屋", "agent": "永慶花蓮中正悠活加盟店 03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7244828"}], "drop": null, "dropFallback": false}, {"n": 17, "new": true, "title": "新城北埔近家樂福住宅區小筆建地", "loc": "嘉平段", "map": "https://www.google.com/maps/search/新城鄉嘉平段北埔家樂福", "area": "106.78", "areaN": 106.78, "price": 698.0, "per": 6.54, "type": "建地（住宅區）", "agent": "永慶吉安和平加盟店／弘天不動產 03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6174356"}], "drop": null, "dropFallback": false}, {"n": 18, "new": true, "title": "七星潭風景區悠閒海景建地｜地上有稅籍屋", "loc": "大漢段，近七星潭", "map": "https://www.google.com/maps/search/新城鄉大漢段七星潭", "area": "19.23（稅籍屋12.70）", "areaN": 19.23, "price": 988.0, "per": 51.38, "type": "土地＋稅籍屋（標題稱建地）", "agent": "永慶吉安和平加盟店／弘天不動產 03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6667919"}], "drop": {"amount": "10", "orig": "998", "cur": "988"}, "dropFallback": false}, {"n": 19, "new": true, "title": "買土地送房屋｜嘉南段住宅建地", "loc": "嘉南段", "map": "https://www.google.com/maps/search/新城鄉嘉南段", "area": "87.12（稅籍屋22.93）", "areaN": 87.12, "price": 696.0, "per": 7.99, "type": "建地（住宅）＋稅籍屋", "agent": "①永慶和平成功加盟店 ②永慶自強大聯加盟店 03-8509988", "links": [{"t": "永慶網-A", "u": "https://buy.yungching.com.tw/house/7514536"}, {"t": "永慶網-B", "u": "https://buy.yungching.com.tw/house/7411918"}], "drop": null, "dropFallback": false}, {"n": 20, "new": true, "title": "新城康樂鄉村乙建小小建地", "loc": "康樂段", "map": "https://www.google.com/maps/search/新城鄉康樂段", "area": "7.81", "areaN": 7.81, "price": 93.6, "per": 11.98, "type": "鄉村區乙種建築用地", "agent": "永慶吉安和平加盟店／弘天不動產 03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7446940"}], "drop": null, "dropFallback": false}, {"n": 21, "new": true, "title": "庭院蓮花池愜意迷人幽靜稅籍平房", "loc": "佳東段", "map": "https://www.google.com/maps/search/新城鄉佳東段", "area": "1083.87（稅籍平房118.16）", "areaN": 1083.87, "price": 480.0, "per": 0.44, "type": "農林用地＋稅籍平房", "agent": "永慶吉安和平加盟店／弘天不動產 03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/6431089"}], "drop": {"amount": "100", "orig": "580", "cur": "480"}, "dropFallback": false}, {"n": 22, "new": true, "title": "慈濟精舍旁步行2分鐘面寬土壤肥沃+現成合法資材室", "loc": "樹林段", "map": "https://www.google.com/maps/search/新城鄉樹林段", "area": "404.74", "areaN": 404.74, "price": 980.0, "per": 2.42, "type": "農地＋合法資材室", "agent": "永慶吉安和平加盟店／弘天不動產 03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7443000"}], "drop": null, "dropFallback": false}, {"n": 23, "new": true, "title": "佳林山景美農地地上有資材室", "loc": "佳林段", "map": "https://www.google.com/maps/search/新城鄉佳林段", "area": "416.24", "areaN": 416.24, "price": 960.0, "per": 2.31, "type": "農地＋資材室", "agent": "永慶花蓮吉安中山加盟店 03-8509988", "links": [{"t": "永慶網", "u": "https://buy.yungching.com.tw/house/7184542"}], "drop": null, "dropFallback": false}, {"n": 24, "new": true, "title": "新城曼波-面寬小筆農地{剩二筆}把握機會", "loc": "草林段，近曼波海灘", "map": "https://www.google.com/maps/search/新城鄉草林段曼波海灘", "area": "108", "areaN": 108.0, "price": 99.0, "per": 0.92, "type": "都內農地", "agent": "遠東房屋 值班人員 03-8565500", "links": [{"t": "591", "u": "https://land.591.com.tw/sale/19141530"}], "drop": null, "dropFallback": false}]}]};
+  var $ = function (s) { return document.querySelector(s); };
+  var ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ESC[c]; }); };
+  var safeUrl = function (u) { return /^https?:\/\//i.test(u) ? u : '#'; };
+  var PHONE = /(^|[^\d-])(0\d{1,3}-?\d{3,4}-?\d{3,4})(?:轉(\d+))?/g;
+
+  var ROWS = [];
+  D.towns.forEach(function (t) {
+    t.rows.forEach(function (r) {
+      r.town = t.name;
+      r.isDrop = !!(r.drop || r.dropFallback);
+      r.hay = (t.name + ' ' + r.title + ' ' + r.loc + ' ' + r.type + ' ' + r.agent + ' #' + r.n).toLowerCase();
+      ROWS.push(r);
+    });
+  });
+  var TOWNS = D.towns.map(function (t) { return t.name; });
+
+  var dropAmt = function (r) { return r.drop ? parseFloat(r.drop.amount) : (r.dropFallback ? 0 : -1); };
+  var SORTS = {
+    priceAsc: function (a, b) { return a.price - b.price; },
+    priceDesc: function (a, b) { return b.price - a.price; },
+    perAsc: function (a, b) { return a.per - b.per; },
+    areaDesc: function (a, b) { return (b.areaN || 0) - (a.areaN || 0); },
+    dropDesc: function (a, b) { return dropAmt(b) - dropAmt(a); }
+  };
+
+  var st = { town: '全部', q: '', sort: 'default', drop: false, nw: false, view: null };
+  try { st.view = localStorage.getItem('hl-view'); } catch (e) {}
+  if (st.view !== 'cards' && st.view !== 'table') st.view = null;
+  var mq = window.matchMedia('(min-width:1100px)');
+  var curView = function () { return st.view || (mq.matches ? 'table' : 'cards'); };
+
+  var linkPhones = function (t) {
+    return esc(t).replace(PHONE, function (m, pre, num, ext) {
+      var href = 'tel:' + num.replace(/-/g, '') + (ext ? ',' + ext : '');
+      return pre + '<a class="tel" href="' + href + '">' + num + (ext ? '轉' + ext : '') + '</a>';
+    });
+  };
+  var agentHTML = function (a) {
+    return a.split(/(?=[①-⑩])/).filter(function (p) { return p.trim(); })
+      .map(function (p) { return '<div class="ag">' + linkPhones(p.trim()) + '</div>'; }).join('');
+  };
+  var tagsHTML = function (r) {
+    return (r.new ? '<b class="tag new">新</b>' : '') + (r.isDrop ? '<b class="tag drop">降</b>' : '');
+  };
+  var dropHTML = function (r) {
+    if (r.drop) {
+      return '<span class="dn">▼ 降 ' + esc(r.drop.amount) + ' 萬' +
+        (r.drop.orig ? '<span class="rng">' + esc(r.drop.orig) + ' → ' + esc(r.drop.cur) + '</span>' : '') + '</span>';
+    }
+    return r.dropFallback ? '<span class="dn">▼ 降價</span>' : '';
+  };
+  var linksHTML = function (r, cls) {
+    return r.links.map(function (l) {
+      return '<a class="' + cls + '" href="' + esc(safeUrl(l.u)) + '" target="_blank" rel="noopener noreferrer">' + esc(l.t) + '</a>';
+    }).join(cls === 'btn fill' ? '' : '、');
+  };
+  var mapHTML = function (r, cls) {
+    return r.map ? '<a class="' + cls + '" href="' + esc(safeUrl(r.map)) + '" target="_blank" rel="noopener noreferrer">地圖</a>' : '';
+  };
+  var num = function (x) { return x == null ? '' : String(x); };
+
+  function cardHTML(r, showTown) {
+    return '<article class="card">' +
+      '<div class="c-top"><span class="no">' + tagsHTML(r) + '#' + r.n + '</span><h3>' + esc(r.title) + '</h3></div>' +
+      '<div class="price"><span class="p">' + num(r.price) + '<small>萬</small></span>' +
+      '<span class="s">' + num(r.per) + ' 萬/坪</span></div>' +
+      dropHTML(r) +
+      '<dl class="kv">' +
+      '<dt>位置</dt><dd>' + (showTown ? esc(r.town) + '・' : '') + esc(r.loc) + '</dd>' +
+      '<dt>坪數</dt><dd>' + esc(r.area) + '</dd>' +
+      '<dt>類型</dt><dd>' + esc(r.type) + '</dd>' +
+      '<dt>房仲</dt><dd>' + agentHTML(r.agent) + '</dd>' +
+      '</dl>' +
+      '<div class="act">' + linksHTML(r, 'btn fill') + mapHTML(r, 'btn') + '</div>' +
+      '</article>';
+  }
+
+  function rowHTML(r, showTown) {
+    return '<tr>' +
+      '<td class="no2">' + tagsHTML(r) + r.n + '</td>' +
+      '<td>' + esc(r.title) + '</td>' +
+      '<td>' + (showTown ? esc(r.town) + '・' : '') + esc(r.loc) + (r.map ? ' ' + mapHTML(r, 'tel') : '') + '</td>' +
+      '<td class="n ar" style="white-space:normal">' + esc(r.area) + '</td>' +
+      '<td class="n"><b>' + num(r.price) + '</b></td>' +
+      '<td class="n">' + num(r.per) + '</td>' +
+      '<td>' + esc(r.type) + '</td>' +
+      '<td>' + agentHTML(r.agent) + '</td>' +
+      '<td>' + linksHTML(r, 'tel') + '</td>' +
+      '<td class="nt">' + dropHTML(r) + '</td>' +
+      '</tr>';
+  }
+
+  function matches(r, terms) {
+    if (st.drop && !r.isDrop) return false;
+    if (st.nw && !r.new) return false;
+    for (var i = 0; i < terms.length; i++) if (r.hay.indexOf(terms[i]) < 0) return false;
+    return true;
+  }
+
+  function render() {
+    var terms = st.q.toLowerCase().split(/\s+/).filter(Boolean);
+    var base = ROWS.filter(function (r) { return matches(r, terms); });
+    var list = st.town === '全部' ? base.slice() : base.filter(function (r) { return r.town === st.town; });
+    if (SORTS[st.sort]) list.sort(SORTS[st.sort]);
+
+    var counts = {};
+    base.forEach(function (r) { counts[r.town] = (counts[r.town] || 0) + 1; });
+    var chips = document.querySelectorAll('.chip');
+    for (var i = 0; i < chips.length; i++) {
+      var tn = chips[i].getAttribute('data-town');
+      chips[i].setAttribute('aria-pressed', String(tn === st.town));
+      chips[i].lastChild.textContent = tn === '全部' ? base.length : (counts[tn] || 0);
+    }
+    $('#fDrop').setAttribute('aria-pressed', String(st.drop));
+    $('#fNew').setAttribute('aria-pressed', String(st.nw));
+    var v = curView();
+    var segs = document.querySelectorAll('.seg button');
+    for (var j = 0; j < segs.length; j++) segs[j].setAttribute('aria-pressed', String(segs[j].getAttribute('data-v') === v));
+    $('#count').textContent = '顯示 ' + list.length + ' / ' + ROWS.length + ' 筆';
+
+    var grouped = st.town === '全部' && st.sort === 'default';
+    var showTown = !grouped && st.town === '全部';
+    var out = '';
+    if (!list.length) {
+      out = '<div class="empty">沒有符合條件的物件</div>';
+    } else if (v === 'cards') {
+      out = '<div class="grid">';
+      var last = null;
+      list.forEach(function (r) {
+        if (grouped && r.town !== last) {
+          last = r.town;
+          out += '<h2 class="grp">' + esc(r.town) + '<span>' + counts[r.town] + ' 筆</span></h2>';
+        }
+        out += cardHTML(r, showTown);
+      });
+      out += '</div>';
+    } else {
+      out = '<div class="tablewrap"><table><thead><tr>' +
+        '<th>#</th><th>標題</th><th>位置</th><th class="n">坪數</th><th class="n">總價(萬)</th><th class="n">單價(萬/坪)</th>' +
+        '<th>類型</th><th>房仲資訊</th><th>連結</th><th>備註</th></tr></thead><tbody>';
+      var lastT = null;
+      list.forEach(function (r) {
+        if (grouped && r.town !== lastT) {
+          lastT = r.town;
+          out += '<tr class="g"><td colspan="10">' + esc(r.town) + '（' + counts[r.town] + ' 筆）</td></tr>';
+        }
+        out += rowHTML(r, showTown);
+      });
+      out += '</tbody></table></div>';
+    }
+    $('#out').innerHTML = out;
+  }
+
+  function init() {
+    var total = ROWS.length;
+    $('#meta').textContent = '更新 ' + D.updated + '・共 ' + total + ' 筆';
+    var names = ['全部'].concat(TOWNS);
+    $('#chips').innerHTML = names.map(function (n) {
+      return '<button type="button" class="chip" data-town="' + esc(n) + '" aria-pressed="false">' + esc(n) + '<span></span></button>';
+    }).join('');
+    $('#nDrop').textContent = ROWS.filter(function (r) { return r.isDrop; }).length;
+    $('#nNew').textContent = ROWS.filter(function (r) { return r.new; }).length;
+
+    $('#chips').addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.chip') : null;
+      if (!b) return;
+      st.town = b.getAttribute('data-town');
+      render();
+      window.scrollTo(0, Math.min(window.scrollY, $('#out').offsetTop - $('#bar').offsetHeight - 8));
+    });
+    $('#q').addEventListener('input', function (e) { st.q = e.target.value; render(); });
+    $('#sort').addEventListener('change', function (e) { st.sort = e.target.value; render(); });
+    $('#fDrop').addEventListener('click', function () { st.drop = !st.drop; render(); });
+    $('#fNew').addEventListener('click', function () { st.nw = !st.nw; render(); });
+    document.querySelector('.seg').addEventListener('click', function (e) {
+      var v = e.target.getAttribute && e.target.getAttribute('data-v');
+      if (!v) return;
+      st.view = v;
+      try { localStorage.setItem('hl-view', v); } catch (err) {}
+      render();
+    });
+    if (mq.addEventListener) mq.addEventListener('change', render); else if (mq.addListener) mq.addListener(render);
+
+    var topBtn = $('#top');
+    window.addEventListener('scroll', function () { topBtn.classList.toggle('show', window.scrollY > 600); }, { passive: true });
+    topBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    var setBarH = function () { document.documentElement.style.setProperty('--barh', $('#bar').offsetHeight + 'px'); };
+    setBarH();
+    window.addEventListener('resize', setBarH);
+    render();
+  }
+  init();
+})();
+</script>
+</body>
+</html>
